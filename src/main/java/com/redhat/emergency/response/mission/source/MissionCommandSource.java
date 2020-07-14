@@ -11,6 +11,7 @@ import com.redhat.emergency.response.mission.model.Mission;
 import com.redhat.emergency.response.mission.model.MissionStatus;
 import com.redhat.emergency.response.mission.repository.MissionRepository;
 import io.smallrye.mutiny.Uni;
+import io.smallrye.reactive.messaging.kafka.IncomingKafkaRecordMetadata;
 import io.smallrye.reactive.messaging.kafka.KafkaRecord;
 import io.vertx.core.json.JsonObject;
 import org.eclipse.microprofile.reactive.messaging.Acknowledgment;
@@ -37,6 +38,10 @@ public class MissionCommandSource {
     @Outgoing("mission-event")
     @Acknowledgment(Acknowledgment.Strategy.PRE_PROCESSING)
     public Uni<Message<String>> process(Message<String> missionCommandMessage) {
+
+        Optional<IncomingKafkaRecordMetadata> metadata = missionCommandMessage.getMetadata(IncomingKafkaRecordMetadata.class);
+        metadata.ifPresent(m -> log.debug("Consumed message from topic '" + m.getTopic() + "', partition:offset '" + m.getPartition() + ":" + m.getOffset() + "'"));
+
 
         return Uni.createFrom().item(missionCommandMessage)
                 .onItem().apply(mcm -> accept(missionCommandMessage.getPayload()))
