@@ -3,6 +3,10 @@ ObjectStore/
 .idea/**/gradle.xml
 .idea/**/libraries
 
+#eclipse
+.settings/*
+.project
+.classpath
 # CMake
 cmake-build-debug/
 
